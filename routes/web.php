@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TransactionController;
+use App\Models\Product;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,11 +22,7 @@ use App\Http\Controllers\TransactionController;
 
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/', function () {
-        return view('dashboard', [
-            'title' => 'Dashboard',
-        ]);
-    });
+    Route::get('/', [ProductController::class, 'index']);
     Route::get('/user', [AuthController::class, 'index']);
     Route::get('/user/delete/{id}', [AuthController::class, 'destroy']);
     Route::get('/register', [AuthController::class, 'register']);

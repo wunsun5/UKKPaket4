@@ -2,10 +2,47 @@
 
 @section('container')
     <div class="container">
-        <h3 class="my-3">{{ $title }}</h3>
-        <hr class="my-3 mb-5">
+        <div class="d-flex flex-nowrap align-items-center justify-content-between pt-3 pb-2 mb-4  border-bottom">
+            <h1 class="h3">{{ $title }}</h1>
+            <form>
+                @if (request(['start_date', 'end_date']))
+                    <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                    <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                @endif
+                <input type="text" class="form-control" name="search" placeholder="Search..."
+                    value="{{ request('search') }}" autofocus>
+            </form>
+        </div>
         <div class="row gap-2">
-            <div class="table-responsive col-md-8 col-lg-9 mb-3">
+            <div class="table-responsive table-sm mb-3">
+                <form method="GET" class="mx-2">
+                    <div class="row mt-4">
+                        @if (request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}" />
+                        @endif
+                        <div class="col-md-4 col-sm-5 mb-1">
+                            <label class="form-label ms-1" for="start_date">Start Date : </label>
+                            <input class="form-control" type="date" id="start_date" name="start_date"
+                                placeholder="Pilih Tanggal" value="{{ old('start_date', request('start_date')) }}">
+                            @error('start_date')
+                                <div class="text-danger mx-1 small error-message">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="col-md-4 col-sm-5 mb-1">
+                            <label class="form-label ms-1" for="end_date">End Date : </label>
+                            <input class="form-control" type="date" id="end_date" name="end_date"
+                                placeholder="Pilih Tanggal" value="{{ old('end_date', request('end_date')) }}">
+                            @error('end_date')
+                                <div class="text-danger mx-1 small error-message">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    <button class="btn btn-success my-4 px-3" type="submit">Filter</button>
+                </form>
                 <div class="print-area">
                     <table class="table table-body-tertiary table-striped small">
                         <thead class="table-secondary">

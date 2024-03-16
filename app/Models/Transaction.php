@@ -34,8 +34,25 @@ class Transaction extends Model
         return 'T' . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 
-    public function transactions(){
-        return $this->hasMany(Transaction::class);
+    public function scopeSearch($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->whereHas('customer', function ($query) use ($search) {
+                $query->where('nama_pelanggan', 'like', '%' . $search . '%');
+            })->orWhere('id', 'like', '%' . $search . '%');
+        });
+
+        $query->when($filters['start_date'] ?? false, function ($query, $search){
+            return $query->whereDate('created_at', '>=', $search);
+        });
+
+        $query->when($filters['end_date'] ?? false, function ($query, $search){
+            return $query->whereDate('created_at', '<=', $search);
+        });
+    }
+
+    public function details(){
+        return $this->hasMany(DetailTransaction::class);
     }
 
     public function customer(){

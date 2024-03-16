@@ -1,5 +1,5 @@
 <div class="row mt-5 mb-3">
-    <div class="table-responsive col-xl-7 small">
+    <div class="table-responsive col-xl-9 small">
         <table class="table table-sm table-striped">
             <thead>
                 <tr>
@@ -35,5 +35,6 @@
                 @endforeach
             </tbody>
         </table>
+        {{ $products->links() }}
     </div>
 </div>

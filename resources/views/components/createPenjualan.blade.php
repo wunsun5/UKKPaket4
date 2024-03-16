@@ -18,7 +18,7 @@
             <label for="form-label" class="mb-2 ms-1">Jumlah Produk <span
                     class="text-danger">*</span></label>
             <input class="form-control mb-2 jumlah_produk" type="number" name="jumlah_produk[]"
-                placeholder="Jumlah Produk" oninput="hitung()" />
+                placeholder="Jumlah Produk" oninput="hitung(this)" />
         </div>
         <div class="col-lg-3 col-md-6 col-12">
             <label for="form-label" class="mb-2 ms-1">Subtotal</label>

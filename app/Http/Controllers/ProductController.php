@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use DivisionByZeroError;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Models\DetailTransaction;
 
 class ProductController extends Controller
 {
@@ -14,7 +17,24 @@ class ProductController extends Controller
      */
     public function index()
     {
+        $terjual = DetailTransaction::sum('jumlah_produk');
+        $sisa_stok = Product::sum('stok');
+        $jumlah_stok = $terjual + $sisa_stok;
 
+        try {
+            $persentase = $terjual / $jumlah_stok;
+        } catch (DivisionByZeroError $e) {
+            $persentase = 0;
+        }
+
+        return view('dashboard', [
+            'title' => 'Dashboard',
+            'jumlah_produk' => Product::count(),
+            'total_pendapatan' => Transaction::sum('total_harga'),
+            'terjual' => $terjual,
+            'jumlah_stok' => $jumlah_stok,
+            'persentase' => $persentase,
+        ]);
     }
 
     /**
@@ -46,7 +66,7 @@ class ProductController extends Controller
 
         Product::create($validated);
 
-        return back()->with('success','Produk baru berhasil ditambahkan !');
+        return back()->with('success', 'Produk baru berhasil ditambahkan !');
     }
 
     /**
@@ -93,7 +113,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect('/product/create')->with('success','Produk berhasil diperbaharui !');
+        return redirect('/product/create')->with('success', 'Produk berhasil diperbaharui !');
     }
 
     /**

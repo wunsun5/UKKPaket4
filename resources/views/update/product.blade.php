@@ -1,10 +1,10 @@
 @extends('main.body')
 
 @section('container')
+    <div class="d-flex flex-nowrap align-items-center justify-content-between pt-3 pb-2 mb-4  border-bottom">
+        <h1 class="h3">{{ $title }}</h1>
+    </div>
     <div class="row">
-        <h3 class="my-2 mb-3 px-0 mx-0">{{ $title }}</h3>
-        <hr class="mb-4">
-
         <form action="/product/{{ $product->id }}" method="POST" class="border rounded col-lg-10">
             @method('PUT')
             @csrf
@@ -12,8 +12,8 @@
                 <h4 class="my-3 mb-4">Edit Produk</h4>
                 <div class="col-md-4">
                     <label for="form-label" class="mb-2 ms-1">Nama Produk</label>
-                    <input class="form-control mb-2" type="text" name="nama_produk" id="nama_produk" placeholder="Nama Produk"
-                        value="{{ old('nama_produk', $product->nama_produk) }}" readonly />
+                    <input class="form-control mb-2" type="text" name="nama_produk" id="nama_produk"
+                        placeholder="Nama Produk" value="{{ old('nama_produk', $product->nama_produk) }}" readonly />
                     @error('nama_produk')
                         <div class="text-danger small ms-1">
                             {{ $message }}
@@ -22,7 +22,8 @@
                 </div>
                 <div class="col-md-4">
                     <label for="form-label" class="mb-2 ms-1">Harga</label>
-                    <input class="form-control mb-2" type="number" name="harga" value="{{ old('harga', $product->harga) }}" readonly />
+                    <input class="form-control mb-2" type="number" name="harga"
+                        value="{{ old('harga', $product->harga) }}" readonly />
                     @error('harga')
                         <div class="text-danger small ms-1">
                             {{ $message }}

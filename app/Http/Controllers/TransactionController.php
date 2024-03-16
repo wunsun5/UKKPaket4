@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Customer;
-use App\Models\DetailTransaction;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Models\DetailTransaction;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
@@ -17,9 +18,29 @@ class TransactionController extends Controller
      */
     public function index()
     {
+        $title = 'Semua Penjualan';
+
+        if (request(['start_date', 'end_date'])) {
+            $validated = Validator::make(request(['start_date', 'end_date']), [
+                'start_date' => 'required',
+                'end_date' => 'required',
+            ]);
+
+            if ($validated->fails()) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'start_date' => 'Kolom ini harus diisi',
+                        'end_date' => 'Kolom ini harus diisi'
+                    ]);
+            }
+
+            $title = 'Penjualan ' . request('start_date') . ' - ' . request('end_date');
+        }
+
         return view('transactions', [
-            'title' => 'Semua Penjualan',
-            'transactions' => Transaction::orderBy('id')->paginate(15),
+            'title' => $title,
+            'transactions' => Transaction::orderBy('id')->search(request(['search', 'start_date', 'end_date']))->paginate(1),
             'total_penjualan' => Transaction::sum('total_harga'),
         ]);
     }
@@ -46,6 +67,7 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'customer' => 'required',
             'produk_id.*' => 'required',
@@ -72,10 +94,10 @@ class TransactionController extends Controller
 
         $transaction = Transaction::create([
             'customer_id' => $validated['customer'],
-            'total_harga' => array_sum($request->input('harga')),
+            'total_harga' => array_sum($request->input('subtotal')),
         ]);
 
-        foreach ($produk as $index => $produk) {
+        foreach ($produk_id as $index => $produk) {
             $produkSelected = Product::find($produk);
 
             DetailTransaction::create([
@@ -97,9 +119,13 @@ class TransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Transaction $transaction)
     {
-        //
+        return view('transaction', [
+            'title' => 'Nota ' . $transaction->id . ' - ' . ($transaction->customer->nama_pelanggan),
+            'transaction' => $transaction,
+            'details' => $transaction->details()->with('product')->get(),
+        ]);
     }
 
     /**

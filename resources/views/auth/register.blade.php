@@ -1,7 +1,7 @@
 @extends('main.body')
 
 @section('container')
-    <div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 80vh">
+    <div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 85vh">
         <div class="container col-md-7 col-xl-5 p-4 bg-white shadow">
             <h3 class="text-center my-3">Regitrasi</h3>
             <form action="/register" method="POST">
@@ -15,7 +15,7 @@
                         {{ $message }}
                     </div>
                 @enderror
-                <label class="form-label mt-3 ms-1" for="email">Email</label>
+                <label class="form-label mt-2 ms-1" for="email">Email</label>
                 <input type="email" name="email" id="email"
                     class="form-control @error('email') is-invalid @enderror" placeholder="Email"
                     value="{{ old('email') }}" />
@@ -24,8 +24,8 @@
                         {{ $message }}
                     </div>
                 @enderror
-                <label class="form-label mt-3 ms-1" for="level">Level</label>
-                <select name="level" id="level" class="form-select mb-3 @error('level') is-invalid @enderror">
+                <label class="form-label mt-2 ms-1" for="level">Level</label>
+                <select name="level" id="level" class="form-select @error('level') is-invalid @enderror">
                     @if (old('level') == 'petugas')
                         <option value="admin">Admin</option>
                         <option value="petugas" selected>Petugas</option>
@@ -34,7 +34,7 @@
                         <option value="petugas">Petugas</option>
                     @endif
                 </select>
-                <label class="form-label mt-3 ms-1" for="password">Password</label>
+                <label class="form-label mt-2 ms-1" for="password">Password</label>
                 <input type="password" name="password" id="password"
                     class="form-control @error('password') is-invalid @enderror" placeholder="Password"
                     value="{{ old('password') }}" />

@@ -41,7 +41,7 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'nama_pelanggan' => 'required',
             'alamat' => '',
-            'no_telp' => 'numeric',
+            'no_telp' => '',
         ]);
 
         Customer::create($validated);
@@ -87,7 +87,7 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'nama_pelanggan' => 'required',
             'alamat' => '',
-            'no_telp' => 'numeric',
+            'no_telp' => '',
         ]);
 
         $customer->update($validated);

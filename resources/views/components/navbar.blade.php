@@ -4,7 +4,7 @@
     @auth
         <ul class="navbar-nav flex-row">
             <li class="nav-items d-flex align-items-center">
-                <span class="text-white d-none d-sm-inline">Admin</span>
+                <span class="text-white d-none d-sm-inline">{{ Auth::user()->username }}</span>
                 <img src="" alt="" class="rounded-circle mx-2" style="width: 2em; height: 2em;">
             </li>
             <li class="nav-items">

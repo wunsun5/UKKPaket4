@@ -1,21 +1,21 @@
 @extends('main.body')
 
 @section('container')
+    <div class="d-flex flex-nowrap align-items-center justify-content-between pt-3 pb-2 mb-4  border-bottom">
+        <h1 class="h3">{{ $title }}</h1>
+    </div>
     <div class="row">
-        <h3 class="my-2 mb-3 px-0 mx-0">{{ $title }}</h3>
-        <hr class="mb-4">
-
         <form action="/transaction" method="POST" class="border rounded col-lg-11">
             @csrf
             <div class="row py-3 px-3 products">
-                <h4 class="my-3 mb-4">Produk</h4>
+                <h4 class="my-3 mb-4">Buat Penjualan</h4>
                 <div class="col-md-3 pe-4 mb-3">
                     <label for="customer" class="mb-2 ms-1">Customer <span class="text-danger">*</span></label>
-                    <select name="customer" id="customer" class="form-select">
+                    <select name="customer" id="customer" class="form-select" onchange="addCustomer(this)">
                         <option value="" hidden selected></option>
                         <option value="/customer/create">Tambah Customer</option>
                         @foreach ($customers as $customer)
-                            <option value="{{ $customer->nama_pelanggan }}">
+                            <option value="{{ $customer->id }}">
                                 {{ $customer->nama_pelanggan . ' - ' . $customer->id }}</option>
                         @endforeach
                     </select>
@@ -30,7 +30,7 @@
                         <div class="product position-relative mb-3">
                             <div class="row pe-4">
                                 <div class="col-lg-3 col-md-6 col-12">
-                                    <label for="form-label" class="mb-2 ms-1">Nama Produk <span
+                                    <label for="form-label" class="mt-4 mb-2 ms-1">Nama Produk <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select produk_id" name="produk_id[]" onchange="cariProduk(this)">
                                         <option value="" hidden selected></option>
@@ -53,15 +53,16 @@
                                     @enderror
                                 </div>
                                 <div class="col-lg-3 col-md-6 col-12">
-                                    <label for="form-label" class="mb-2 ms-1">Harga</label>
+                                    <label for="form-label" class="mt-4 mb-2 ms-1">Harga</label>
                                     <input class="form-control mb-2 harga" type="text" name="harga[]" placeholder="Harga"
                                         value="{{ old('harga')[$index] }}" readonly />
                                 </div>
                                 <div class="col-lg-3 col-md-6 col-12">
-                                    <label for="form-label" class="mb-2 ms-1">Jumlah Produk <span
+                                    <label for="form-label" class="mt-4 mb-2 ms-1">Jumlah Produk <span
                                             class="text-danger">*</span></label>
                                     <input class="form-control mb-2 jumlah_produk" type="number" name="jumlah_produk[]"
-                                        placeholder="Jumlah Produk" value="{{ old('jumlah_produk')[$index] }}" />
+                                        placeholder="Jumlah Produk" value="{{ old('jumlah_produk')[$index] }}"
+                                        oninput="hitung(this)" />
                                     @error('jumlah_produk.' . $index)
                                         <div class="text-danger err-message small ms-1">
                                             {{ $message }}
@@ -69,7 +70,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-lg-3 col-md-6 col-12">
-                                    <label for="form-label" class="mb-2 ms-1">Subtotal</label>
+                                    <label for="form-label" class="mt-4 mb-2 ms-1">Subtotal</label>
                                     <input class="form-control mb-2 subtotal" type="number" name="subtotal[]"
                                         placeholder="Subtotal" value="{{ old('subtotal')[$index] }}" readonly />
                                 </div>
@@ -91,7 +92,11 @@
     </div>
 
     <script>
-        $('.delete-penjualan').hide();
+        let selectedProduct = false;
+
+        if($('.product').length <= 1){
+            $('.delete-penjualan').hide();
+        }
         unreload();
 
         function unreload() {
@@ -107,10 +112,12 @@
         function addPenjualan() {
             let newPenjualan = $('.product:first').clone();
             newPenjualan.find('input').val('');
-            newPenjualan.find('select option:first').prop('selected', true);
+            newPenjualan.find('.produk_id').attr('produk_id', '');
+            newPenjualan.find('.produk_id option:first').prop('selected', true);
             newPenjualan.find('.err-message').hide();
             $('.products').append(newPenjualan);
             $('.delete-penjualan').show();
+            newPenjualan.find('.produk_id').focus();
         }
 
         function deletePenjualan(element) {
@@ -121,35 +128,60 @@
             }
         }
 
+        function addCustomer(element) {
+            if ($(element).val() == '/customer/create') {
+                return window.location.href = $(element).val();
+            }
+        }
+
+        function hitung(element) {
+            let produkForm = $(element).parent('div').parent('.row').parent('.product');
+            let harga = produkForm.find('.harga');
+            let subtotal = produkForm.find('.subtotal');
+            subtotal.val($(element).val() * harga.val());
+        }
+
         function cariProduk(element) {
             let produkForm = $(element).parent('div').parent('.row').parent('.product');
 
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                },
-                type: 'GET',
-                url: 'http://localhost:8000/product/' + element.value,
-                success: function(response) {
-                    $('.product').each(function() {
-                        if ($(element).find('.produk_id').val() == '') {
-                            $(element).find('.produk_id').val(response.id);
-                            $(element).find('.nama_produk').val(response.nama_produk);
-                            $(element).find('.harga').val(response.harga);
-
-                            let jmlProduct = $(element).find('.jumlah_produk').val();
-                            $(element).find('.subtotal').val(response.harga * (jmlProduct ==
-                                '' ? 0 : jmlProduct));
-                            $('#select_product').find('option:first').prop('selected', true);
-                            $(element).find('.jml_product').focus();
-                            return false;
-                        }
-                    })
-                },
-                error: function(error) {
-                    console.log(error);
+            $('.product').each(function() {
+                if ($(this).find('.produk_id').attr('produk_id') == $(element).val()) {
+                    alert('Produk ini sudah dipilih, pilih produk lain');
+                    $(element).find('option[value=' + $(element).attr('produk_id') + ']').prop('selected', true);
+                    selectedProduct = true;
+                    return false;
                 }
             })
+
+            // console.log(selectedProduct)
+
+            if (!selectedProduct) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    type: 'GET',
+                    dataType: 'JSON',
+                    url: 'http://localhost:8000/product/' + element.value,
+                    data: {},
+                    success: function(response) {
+                        $(produkForm).find('.produk_id').val(response.id);
+                        $(produkForm).find('.produk_id').attr('produk_id', response.id);
+                        $(produkForm).find('.nama_produk').val(response.nama_produk);
+                        $(produkForm).find('.harga').val(response.harga);
+
+                        let jmlProduct = $(produkForm).find('.jumlah_produk').val();
+                        $(produkForm).find('.subtotal').val(response.harga * (jmlProduct ==
+                            '' ? 0 : jmlProduct));
+                        $(produkForm).find('.jumlah_produk').focus();
+                        return false;
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                })
+            }
+            selectedProduct = false;
         }
     </script>
 @endsection

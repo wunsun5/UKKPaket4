@@ -20,7 +20,7 @@
 <div class="container-fluid">
     <div class="row">
         @include('components.sidebar')
-        <main class="col-md-9 col-xl-10 py-3 px-md-5 px-4 min-vh-100">
+        <main class="col-md-9 col-xl-10 py-2 px-md-4 px-4 min-vh-100">
             @yield('container')
         </main>
     </div>
