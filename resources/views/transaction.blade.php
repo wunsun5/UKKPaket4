@@ -67,10 +67,10 @@
     <button class="btn btn-primary px-4 my-4" id="print">Print</button>
 
     <script>
-        $('#btn-print').click(function() {
+        $('#print').click(function() {
             let page = $('body').html();
-            let printArea = $('.print-area').html();
-            $('body').html("<h4 class='my-3 text-center'>{{ $title }}</h4>")
+            let printArea = $('#print-area').html();
+            $('body').html("<h4 class='my-3 mx-4'>{{ $title }}</h4>")
             $('body').append(printArea);
 
             window.print();
